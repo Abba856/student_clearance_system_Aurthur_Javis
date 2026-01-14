@@ -45,6 +45,10 @@ $row2 = mysqli_fetch_array($result);
   <link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
   <!-- summernote -->
   <link rel="stylesheet" href="plugins/summernote/summernote-bs4.min.css">
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="css/admin-custom.css">
+  <!-- Global design system -->
+  <link rel="stylesheet" href="../css/global-design-system.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -338,11 +342,7 @@ while($row_new_students = $result->fetch_assoc()) {
 
   <!-- Main Footer -->
   <footer class="main-footer">
-    <strong><?php include('../footer.php');  ?></strong>
-  
-    <div class="float-right d-none d-sm-inline-block">
-   
-    </div>
+    <?php include('../footer.php'); ?>
   </footer>
 </div>
 <!-- ./wrapper -->
@@ -370,5 +370,79 @@ while($row_new_students = $result->fetch_assoc()) {
 <script src="dist/js/demo.js"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="dist/js/pages/dashboard2.js"></script>
+
+<script>
+  $(document).ready(function() {
+    // Add ripple effect to buttons
+    $('.btn').on('click', function(e) {
+      let $button = $(this);
+      let circle = $('<span class="ripple"></span>');
+
+      // Remove any existing ripples
+      $button.find('.ripple').remove();
+
+      // Add the ripple to the button
+      $button.append(circle);
+
+      // Position the ripple
+      let xPos = e.pageX - $button.offset().left;
+      let yPos = e.pageY - $button.offset().top;
+
+      circle.css({
+        top: yPos,
+        left: xPos
+      });
+
+      // Remove the ripple after the animation
+      setTimeout(function() {
+        circle.remove();
+      }, 600);
+    });
+
+    // Add hover effects to cards
+    $('.info-box, .card').each(function() {
+      $(this).hover(
+        function() {
+          $(this).addClass('pulse');
+        },
+        function() {
+          $(this).removeClass('pulse');
+        }
+      );
+    });
+
+    // Auto-refresh stats every 30 seconds
+    setInterval(function() {
+      // In a real implementation, you might want to make an AJAX call to refresh stats
+      // For now, we'll just add a subtle animation to show the page is dynamic
+      $('.info-box-number').addClass('pulse');
+      setTimeout(function() {
+        $('.info-box-number').removeClass('pulse');
+      }, 500);
+    }, 30000);
+
+    // Enhanced sidebar toggle
+    $('[data-widget="pushmenu"]').on('click', function() {
+      $('body').toggleClass('sidebar-collapse sidebar-open');
+    });
+
+    // Add tooltips to elements with title attributes
+    $('[title]').tooltip();
+  });
+
+  // Add CSS for pulse animation
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .pulse {
+      animation: pulse 0.5s ease-in-out;
+    }
+  `;
+  document.head.appendChild(style);
+</script>
 </body>
 </html>

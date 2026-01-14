@@ -4,14 +4,14 @@
  include('../connect.php');
 
 $username=$_SESSION['admin-username'];
-$sql = "select * from admin where username='$username'"; 
+$sql = "select * from admin where username='$username'";
 $result = $conn->query($sql);
 $row1= mysqli_fetch_array($result);
 
 date_default_timezone_set('Africa/Lagos');
 $current_date = date('Y-m-d H:i:s');
 
- 
+
 if(isset($_POST["btncreate"]))
 {
 
@@ -29,10 +29,10 @@ $result = mysqli_query($conn, $sql);
 if (mysqli_num_rows($result) > 0) {
 $_SESSION['error'] =' Username Already Exist ';
 
-}elseif($password!=$password2){ 
+}elseif($password!=$password2){
 $_SESSION['error'] ='Both Passwords Do not match';
 
-}elseif(strlen($password) < 8){ 
+}elseif(strlen($password) < 8){
 $_SESSION['error'] ='Password must be at least 8 characters';
 
 
@@ -84,6 +84,9 @@ VALUES ('$username','$password','$designation','$fullname','$email','Active','up
   <link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
   <!-- summernote -->
   <link rel="stylesheet" href="plugins/summernote/summernote-bs4.min.css">
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="css/admin-custom.css">
+  <link rel="stylesheet" href="../css/global-design-system.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -95,8 +98,8 @@ VALUES ('$username','$password','$designation','$fullname','$email','Active','up
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>      </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Home</a>      </li>
-      
+        <a href="index.php" class="nav-link">Home</a>      </li>
+
     </ul>
 
     <!-- SEARCH FORM -->
@@ -113,8 +116,8 @@ VALUES ('$username','$password','$designation','$fullname','$email','Active','up
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
- 
-      
+
+
     </ul>
   </nav>
   <!-- /.navbar -->
@@ -123,7 +126,7 @@ VALUES ('$username','$password','$designation','$fullname','$email','Active','up
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="index.php" class="brand-link">
-      <img src="../images/logo.png" alt=" Logo"  width="200" height="111" class="" style="opacity: .8">
+      <img src="../images/logo.png" alt="Logo" width="200" height="111" class="" style="opacity: .8">
 	  <span class="brand-text font-weight-light"></span>
     </a>
 
@@ -155,13 +158,13 @@ VALUES ('$username','$password','$designation','$fullname','$email','Active','up
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-         
+
 		 <?php
 			   include('sidebar.php');
-			   
+
 			   ?>
-		 
-		 
+
+
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -176,11 +179,11 @@ VALUES ('$username','$password','$designation','$fullname','$email','Active','up
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">&nbsp;</h1>
+            <h1 class="m-0 text-dark">Create User</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item"><a href="index.php">Home</a></li>
               <li class="breadcrumb-item active">Create User </li>
             </ol>
           </div><!-- /.col -->
@@ -194,76 +197,113 @@ VALUES ('$username','$password','$designation','$fullname','$email','Active','up
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
-        
-		 <!-- general form elements -->
+          <div class="col-md-6 mx-auto">
+            <!-- general form elements -->
             <div class="card card-primary">
               <div class="card-header">
-                <h3 class="card-title">Create User </h3>
+                <h3 class="card-title">Create New Admin User</h3>
+                <div class="card-tools">
+                  <a href="admin-record.php" class="btn btn-secondary btn-sm">
+                    <i class="fa fa-list"></i> View All Users
+                  </a>
+                </div>
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-               <form id="form" action="" method="post" class="">
+               <form id="form" action="" method="post" class="needs-validation" novalidate>
                 <div class="card-body">
                   <div class="form-group">
-                    <label for="exampleInputEmail1">Username </label>
-                    <input type="text" class="form-control" name="txtusername" id="exampleInputEmail1" size="77" value="<?php if (isset($_POST['txtusername']))?><?php echo $_POST['txtusername']; ?>" placeholder="Enter Username">
+                    <label for="txtusername">Username *</label>
+                    <input type="text" class="form-control" name="txtusername" id="txtusername" size="77" value="<?php if (isset($_POST['txtusername'])) echo $_POST['txtusername']; ?>" placeholder="Enter Username" required>
+                    <div class="invalid-feedback">
+                      Please enter a username
+                    </div>
                   </div>
-				   <div class="form-group">
-                    <label for="exampleInputEmail1">Fullname </label>
-                    <input type="text" class="form-control" name="txtfullname" id="exampleInputEmail1" size="77" value="<?php if (isset($_POST['txtfullname']))?><?php echo $_POST['txtfullname']; ?>" placeholder="Enter Fullname">
-                  </div>
+				  
                   <div class="form-group">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" name="txtpassword" id="exampleInputPassword1" size="77" value="<?php if (isset($_POST['txtpassword']))?><?php echo $_POST['txtpassword']; ?>" placeholder="Enter Password">
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputPassword1">Re-Password</label>
-                    <input type="password" class="form-control" name="txtpassword2" id="exampleInputPassword1" size="77" value="<?php if (isset($_POST['txtpassword2']))?><?php echo $_POST['txtpassword2']; ?>" placeholder="Confirm Password">
-                  </div>
-				  <div class="form-group">
-                    <label for="exampleInputPassword1">Designation</label>
-                    <select name="cmddesignation" id="select" class="form-control" required="">
-    <option value="Select Designation">Select Designation</option>
-   <option value="Super Admin">Super Admin</option>
-   <option value="Librarian">Librarian</option>
-   <option value="Bursar">Bursar</option>
-   <option value="Sport Director">Sport Director</option>
-
-   </select> 
-                     </div>
-                  <div class="form-group">
-                    <label for="exampleInputPassword1">Email</label>
-                    <input type="text" class="form-control" name="txtemail" id="exampleInputPassword1" size="77" value="<?php if (isset($_POST['txtemail']))?><?php echo $_POST['txtemail']; ?>" placeholder="Enter Email">
+                    <label for="txtfullname">Full Name *</label>
+                    <input type="text" class="form-control" name="txtfullname" id="txtfullname" size="77" value="<?php if (isset($_POST['txtfullname'])) echo $_POST['txtfullname']; ?>" placeholder="Enter Full Name" required>
+                    <div class="invalid-feedback">
+                      Please enter a full name
+                    </div>
                   </div>
                   
-				 
+                  <div class="form-group">
+                    <label for="txtpassword">Password *</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" name="txtpassword" id="txtpassword" size="77" value="<?php if (isset($_POST['txtpassword'])) echo $_POST['txtpassword']; ?>" placeholder="Enter Password" required minlength="8">
+                      <div class="input-group-append">
+                        <span class="input-group-text toggle-password" style="cursor: pointer;">
+                          <i class="fa fa-eye"></i>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="invalid-feedback">
+                      Please enter a password (minimum 8 characters)
+                    </div>
+                    <small class="form-text text-muted">Password must be at least 8 characters long</small>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="txtpassword2">Confirm Password *</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" name="txtpassword2" id="txtpassword2" size="77" value="<?php if (isset($_POST['txtpassword2'])) echo $_POST['txtpassword2']; ?>" placeholder="Confirm Password" required>
+                      <div class="input-group-append">
+                        <span class="input-group-text toggle-password" style="cursor: pointer;">
+                          <i class="fa fa-eye"></i>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="invalid-feedback">
+                      Please confirm your password
+                    </div>
+                  </div>
+				  
+                  <div class="form-group">
+                    <label for="cmddesignation">Designation *</label>
+                    <select name="cmddesignation" id="cmddesignation" class="form-control" required>
+                      <option value="">Select Designation</option>
+                      <option value="Super Admin" <?php if (isset($_POST['cmddesignation']) && $_POST['cmddesignation'] == 'Super Admin') echo 'selected'; ?>>Super Admin</option>
+                      <option value="Admin" <?php if (isset($_POST['cmddesignation']) && $_POST['cmddesignation'] == 'Admin') echo 'selected'; ?>>Admin</option>
+                      <option value="Librarian" <?php if (isset($_POST['cmddesignation']) && $_POST['cmddesignation'] == 'Librarian') echo 'selected'; ?>>Librarian</option>
+                      <option value="Bursar" <?php if (isset($_POST['cmddesignation']) && $_POST['cmddesignation'] == 'Bursar') echo 'selected'; ?>>Bursar</option>
+                      <option value="Sport Director" <?php if (isset($_POST['cmddesignation']) && $_POST['cmddesignation'] == 'Sport Director') echo 'selected'; ?>>Sport Director</option>
+                    </select>
+                    <div class="invalid-feedback">
+                      Please select a designation
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="txtemail">Email *</label>
+                    <input type="email" class="form-control" name="txtemail" id="txtemail" size="77" value="<?php if (isset($_POST['txtemail'])) echo $_POST['txtemail']; ?>" placeholder="Enter Email" required>
+                    <div class="invalid-feedback">
+                      Please enter a valid email address
+                    </div>
+                  </div>
                 </div>
                 <!-- /.card-body -->
 
                 <div class="card-footer">
-                  <button type="submit" name="btncreate" class="btn btn-primary">Create User</button>
+                  <button type="submit" name="btncreate" class="btn btn-primary btn-block">
+                    <i class="fa fa-user-plus mr-2"></i> Create User
+                  </button>
                 </div>
               </form>
             </div>
-		
+          </div>
         </div>
         <!-- /.row -->
-        <!-- Main row -->
-        <div class="row">
-          <!-- Left col --><!-- /.Left col -->
-          <!-- right col (We are only adding the ID to make the widgets sortable)--><!-- right col -->
-        </div>
-        <!-- /.row (main row) -->
       </div><!-- /.container-fluid -->
     </section>
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
-    <?php include('footer.php');  ?>
     <div class="float-right d-none d-sm-inline-block">
-      
+      <b>Version</b> 1.0.0
     </div>
+    <?php include('../footer.php');  ?>
   </footer>
 
   <!-- Control Sidebar -->
@@ -308,14 +348,87 @@ VALUES ('$username','$password','$designation','$fullname','$email','Active','up
 <script src="dist/js/demo.js"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="dist/js/pages/dashboard.js"></script>
-	
+
+<script>
+  $(document).ready(function() {
+    // Form validation
+    (function() {
+      'use strict';
+      window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+          form.addEventListener('submit', function(event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
+        });
+      }, false);
+    })();
+    
+    // Password visibility toggle
+    $('.toggle-password').on('click', function() {
+      const input = $(this).closest('.input-group').find('input');
+      const icon = $(this).find('i');
+      
+      if (input.attr('type') === 'password') {
+        input.attr('type', 'text');
+        icon.removeClass('fa-eye').addClass('fa-eye-slash');
+      } else {
+        input.attr('type', 'password');
+        icon.removeClass('fa-eye-slash').addClass('fa-eye');
+      }
+    });
+    
+    // Password match validation
+    $('#txtpassword2').on('input', function() {
+      const newPassword = $('#txtpassword').val();
+      const confirmPassword = $(this).val();
+      
+      if (newPassword !== confirmPassword) {
+        $(this).removeClass('is-valid').addClass('is-invalid');
+      } else {
+        $(this).removeClass('is-invalid').addClass('is-valid');
+      }
+    });
+    
+    // Add ripple effect to buttons
+    $('.btn').on('click', function(e) {
+      let $button = $(this);
+      let circle = $('<span class="ripple"></span>');
+      
+      // Remove any existing ripples
+      $button.find('.ripple').remove();
+      
+      // Add the ripple to the button
+      $button.append(circle);
+      
+      // Position the ripple
+      let xPos = e.pageX - $button.offset().left;
+      let yPos = e.pageY - $button.offset().top;
+      
+      circle.css({
+        top: yPos,
+        left: xPos
+      });
+      
+      // Remove the ripple after the animation
+      setTimeout(function() {
+        circle.remove();
+      }, 600);
+    });
+  });
+</script>
+
 <link rel="stylesheet" href="popup_style.css">
 <?php if(!empty($_SESSION['success'])) {  ?>
 <div class="popup popup--icon -success js_success-popup popup--visible">
   <div class="popup__background"></div>
   <div class="popup__content">
     <h3 class="popup__content__title">
-      <strong>Success</strong> 
+      <strong>Success</strong>
     </h1>
     <p><?php echo $_SESSION['success']; ?></p>
     <p>
@@ -323,14 +436,14 @@ VALUES ('$username','$password','$designation','$fullname','$email','Active','up
     </p>
   </div>
 </div>
-<?php unset($_SESSION["success"]);  
+<?php unset($_SESSION["success"]);
 } ?>
 <?php if(!empty($_SESSION['error'])) {  ?>
 <div class="popup popup--icon -error js_error-popup popup--visible">
   <div class="popup__background"></div>
   <div class="popup__content">
     <h3 class="popup__content__title">
-      <strong>Error</strong> 
+      <strong>Error</strong>
     </h1>
     <p><?php echo $_SESSION['error']; ?></p>
     <p>

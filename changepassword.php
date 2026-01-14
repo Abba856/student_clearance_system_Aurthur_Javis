@@ -3,289 +3,403 @@ session_start();
 error_reporting(0);
 include('connect.php');
 
-if(empty($_SESSION['matric_no']))
-    {   
-    header("Location: login.php"); 
-    }
-    else{
-	}
-      
+if(empty($_SESSION['matric_no'])) {
+    header("Location: login.php");
+    exit();
+}
+
 $matric_no = $_SESSION["matric_no"];
 
-                 
-$sql = "select * from students where matric_no='$matric_no'"; 
-$result = $conn->query($sql);
-$rowaccess = mysqli_fetch_array($result);
+// Fetch user data
+$sql = "SELECT * FROM students WHERE matric_no=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $matric_no);
+$stmt->execute();
+$result = $stmt->get_result();
+$rowaccess = $result->fetch_assoc();
 
-date_default_timezone_set('Africa/Lagos');
-$current_date = date('Y-m-d ');
+if (!$rowaccess) {
+    header("Location: login.php");
+    exit();
+}
 
-  $q = "select * from students where matric_no = '$matric_no'";
-  $q1 = $conn->query($q);
-  while($row = mysqli_fetch_array($q1)){
-    extract($row);
-    $db_pass = $row['password'];
-	$matric_no = $row['matric_no'];
-	//$firstname = $row['firstname'];
-	//$lastname = $row['lasttname'];
-	//$fullname=$firstname." ".$lastname;
-  }
+$db_pass = $rowaccess['password'];
 
- if(isset($_POST["btnchange"])){
-$old = mysqli_real_escape_string($conn,$_POST['txtold_password']);
-$pass_new = mysqli_real_escape_string($conn,$_POST['txtnew_password']);
-$confirm_new = mysqli_real_escape_string($conn,$_POST['txtconfirm_password']);
+if(isset($_POST["btnchange"])) {
+    $old_password = trim($_POST['txtold_password']);
+    $new_password = trim($_POST['txtnew_password']);
+    $confirm_password = trim($_POST['txtconfirm_password']);
 
-  
-  if($db_pass!=$old){ ?> 
-    <?php $_SESSION['error']='Old Password not matched';?>
-   <!--  <script>
-    alert('OLD Paasword not matched');
-    </script> -->
-  <?php } else if($pass_new!=$confirm_new){ ?> 
-    <?php $_SESSION['error']='NEW Password and CONFIRM password not Matched';?>
-   <!--  <script>
-    alert('NEW Password and CONFIRM password not Matched');
-    </script> -->
-  <?php } else {
-    //$pass = md5($_POST['password']);
-   $sql = "update  students set `password`='$confirm_new' where matric_no= '".$_SESSION['matric_no']."'";
-  $res = $conn->query($sql);
-  ?>
-   <?php 
-       		
-    header( "refresh:5;url= login.php" );
-   
-   $_SESSION['success']='Password changed Successfully...';
+    // Verify old password using password_verify
+    if (!password_verify($old_password, $db_pass)) {
+        $_SESSION['error'] = 'Old Password is incorrect';
+    } else if ($new_password !== $confirm_password) {
+        $_SESSION['error'] = 'New Password and Confirm Password do not match';
+    } else if (strlen($new_password) < 6) {
+        $_SESSION['error'] = 'Password must be at least 6 characters long';
+    } else {
+        // Hash the new password
+        $hashed_new_password = password_hash($new_password, PASSWORD_DEFAULT);
+
+        // Update the password in database
+        $update_sql = "UPDATE students SET password=? WHERE matric_no=?";
+        $update_stmt = $conn->prepare($update_sql);
+        $update_stmt->bind_param("ss", $hashed_new_password, $matric_no);
+
+        if ($update_stmt->execute()) {
+            $_SESSION['success'] = 'Password changed successfully!';
+            // Redirect to login after success
+            header("refresh:3;url=login.php");
+        } else {
+            $_SESSION['error'] = 'Error updating password. Please try again.';
+        }
     }
-  }
-
-
+}
 ?>
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Change Password| Online clearance system</title>
+    <title>Change Password| Online clearance system</title>
+    
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
-
-    <!-- Morris -->
-    <link href="css/plugins/morris/morris-0.4.3.min.css" rel="stylesheet">
-
-    <!-- Gritter -->
-    <link href="js/plugins/gritter/jquery.gritter.css" rel="stylesheet">
-
-    <link href="css/animate.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-<link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <link href="css/dashboard-style.css" rel="stylesheet">
+    <link href="css/global-design-system.css" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
 </head>
 
-<body>
- <div id="wrapper">
-
-    <nav class="navbar-default navbar-static-side" role="navigation">
-        <div class="sidebar-collapse">
-            <ul class="nav metismenu" id="side-menu">
-                <li class="nav-header">
-                    <div class="dropdown profile-element"> <span>
-                            <img src="<?php echo $rowaccess['photo'];  ?>" alt="image" width="142" height="153" class="img-circle" />
-                             </span>
-  
-   
-                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                            <span class="clear"><span class="text-muted text-xs block">Matric No:<?php echo $rowaccess['matric_no'];  ?> <b class="caret"></b></span> </span> </a>
-                        <ul class="dropdown-menu animated fadeInRight m-t-xs">
-                            
-                            <li><a href="logout.php">Logout</a></li>
-                        </ul>
-  </div>	
-                 
-			   <?php
-			   include('sidebar.php');
-			   
-			   ?>
-			   
-	       </ul>
-
-        </div>
-    </nav>
-
-        <div id="page-wrapper" class="gray-bg">
-        <div class="row border-bottom">
-        <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0">
-        <div class="navbar-header">
-            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
-            
-        </div>
-            <ul class="nav navbar-top-links navbar-right">
-                <li>
-
-<span class="m-r-sm text-muted welcome-message">Welcome to <?php echo $rowaccess['fullname'];?></span>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
-                <li class="dropdown">
-                                    
-
-                <li>
-                    <a href="logout.php">
-                        <i class="fa fa-sign-out"></i> Log out
-                    </a>
-                </li>
-               
             </ul>
-
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="far fa-user"></i>
+                        <span class="badge badge-danger navbar-badge"><?php echo htmlspecialchars($rowaccess['fullname']); ?></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <div class="dropdown-item">
+                            <div class="media">
+                                <img src="<?php echo $rowaccess['photo']; ?>" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title"><?php echo htmlspecialchars($rowaccess['fullname']); ?></h3>
+                                    <p class="text-sm"><?php echo htmlspecialchars($rowaccess['matric_no']); ?></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="logout.php" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </div>
+                </li>
+            </ul>
         </nav>
+        <!-- /.navbar -->
 
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="index.php" class="brand-link">
+                <img src="images/logo.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8; width: auto; height: 40px;">
+                <span class="brand-text font-weight-light">Student Portal</span>
+            </a>
 
-        </div>
-            <div class="row wrapper border-bottom white-bg page-heading">
-                <div class="col-lg-10">
-                    <h2></h2>
-                    <ol class="breadcrumb">
-                        <li>
-                            <a href="index.php">Home</a>
-                        </li>
-                       
-                        <li class="active"><strong>Change Password </strong></li>
-                    </ol>
-                </div>
-                <div class="col-lg-2">
-
-                </div>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <?php
+                include('sidebar.php');
+                ?>
             </div>
-        <div class="wrapper wrapper-content animated fadeInRight">
-            <div class="row">
-            <div class="col-lg-7">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-title">
-                        <h5></h5>
-                        <div class="ibox-tools">
-                            <a class="collapse-link">
-                                <i class="fa fa-chevron-up"></i>
-                            </a>
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                <i class="fa fa-wrench"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">Config option 1</a>
-                                </li>
-                                <li><a href="#">Config option 2</a>
-                                </li>
-                            </ul>
-                            <a class="close-link">
-                                <i class="fa fa-times"></i>
-                            </a>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">Change Password</h1>
                         </div>
-                    </div>
-                    <div class="ibox-content">
-                        <div class="row">
-                            <div class="col-sm-6 b-r">
-                              <h3 class="m-t-none m-b"> Change Password </h3>
-                                <form role="form" method="POST">
-                                    <div class="form-group"><strong>
-                                    <label>Old Password</label></strong>
-                                    <input type="password" name="txtold_password" value="<?php if (isset($_POST['txtold_password']))?><?php echo $_POST['txtold_password']; ?>" placeholder="Enter Old Password" class="form-control" required="">
-                                    </div>
-									 <div class="form-group"><strong>
-                                    <label>New Password</label></strong>
-                                    <input type="password" name="txtnew_password" value="<?php if (isset($_POST['txtnew_password']))?><?php echo $_POST['txtnew_password']; ?>" placeholder="Enter New Password" class="form-control" required="">
-                                    </div>
-									 <div class="form-group"><strong>
-                                    <label>Confirm New Password</label></strong>
-                                    <input type="password" name="txtconfirm_password" value="<?php if (isset($_POST['txtconfirm_password']))?><?php echo $_POST['txtconfirm_password']; ?>" placeholder="Confirm New Password" class="form-control" required="">
-                                    </div>
-									
-                                    <div>
-                                        <button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="submit" name="btnchange"><strong>Change Password</strong></button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col-sm-6">
-                                
-                                <p class="text-center">&nbsp;</p>
-                            </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+                                <li class="breadcrumb-item active">Change Password</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
             </div>
-              <div class="col-lg-5"></div>
-            </div>
-            <div class="row"></div>
-        </div>
-        <div class="footer">
-            <div class="pull-right"></div>
-            <div><?php  include('footer.php'); ?></div>
-        </div>
 
-        </div>
-        </div>
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card card-primary">
+                                <div class="card-header">
+                                    <h3 class="card-title">Update Your Password</h3>
+                                </div>
 
+                                <div class="card-body">
+                                    <?php if(!empty($_SESSION['success'])) { ?>
+                                        <div class="alert alert-success alert-dismissible">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <h5><i class="icon fas fa-check"></i> Success!</h5>
+                                            <?php echo $_SESSION['success']; unset($_SESSION["success"]); ?>
+                                        </div>
+                                    <?php } ?>
 
-    <!-- Mainly scripts -->
+                                    <?php if(!empty($_SESSION['error'])) { ?>
+                                        <div class="alert alert-danger alert-dismissible">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <h5><i class="icon fas fa-ban"></i> Error!</h5>
+                                            <?php echo $_SESSION['error']; unset($_SESSION["error"]); ?>
+                                        </div>
+                                    <?php } ?>
+
+                                    <form role="form" method="POST" class="needs-validation" novalidate>
+                                        <div class="form-group">
+                                            <label for="txtold_password"><strong>Current Password</strong></label>
+                                            <div class="input-group">
+                                                <input type="password"
+                                                       name="txtold_password"
+                                                       id="txtold_password"
+                                                       placeholder="Enter Current Password"
+                                                       class="form-control"
+                                                       required>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text toggle-password" style="cursor: pointer;">
+                                                        <i class="fa fa-eye"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Please enter your current password
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="txtnew_password"><strong>New Password</strong></label>
+                                            <div class="input-group">
+                                                <input type="password"
+                                                       name="txtnew_password"
+                                                       id="txtnew_password"
+                                                       placeholder="Enter New Password"
+                                                       class="form-control"
+                                                       required
+                                                       minlength="6">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text toggle-password" style="cursor: pointer;">
+                                                        <i class="fa fa-eye"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Please enter a new password (at least 6 characters)
+                                            </div>
+                                            <small class="form-text text-muted">
+                                                Password must be at least 6 characters long
+                                            </small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="txtconfirm_password"><strong>Confirm New Password</strong></label>
+                                            <div class="input-group">
+                                                <input type="password"
+                                                       name="txtconfirm_password"
+                                                       id="txtconfirm_password"
+                                                       placeholder="Confirm New Password"
+                                                       class="form-control"
+                                                       required>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text toggle-password" style="cursor: pointer;">
+                                                        <i class="fa fa-eye"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Please confirm your new password
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <button class="btn btn-primary btn-block" type="submit" name="btnchange">
+                                                <i class="fa fa-key mr-2"></i> Update Password
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card card-outline card-info">
+                                <div class="card-header">
+                                    <h3 class="card-title">Password Security Tips</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <div class="p-2 bg-primary rounded-circle me-3">
+                                            <i class="fa fa-shield text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Use Strong Passwords</h6>
+                                            <small class="text-muted">Include uppercase, lowercase, numbers, and symbols</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-start mb-3">
+                                        <div class="p-2 bg-success rounded-circle me-3">
+                                            <i class="fa fa-refresh text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Change Regularly</h6>
+                                            <small class="text-muted">Update your password every 3-6 months</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-start mb-3">
+                                        <div class="p-2 bg-warning rounded-circle me-3">
+                                            <i class="fa fa-lock text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Don't Reuse</h6>
+                                            <small class="text-muted">Avoid using the same password across multiple sites</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-start">
+                                        <div class="p-2 bg-info rounded-circle me-3">
+                                            <i class="fa fa-question-circle text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Need Help?</h6>
+                                            <small class="text-muted">Contact support if you have trouble accessing your account</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4 p-3 bg-light rounded">
+                                        <h5 class="text-center">Password Requirements</h5>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fa fa-check text-success mr-2"></i> At least 6 characters long</li>
+                                            <li><i class="fa fa-check text-success mr-2"></i> Include uppercase and lowercase letters</li>
+                                            <li><i class="fa fa-check text-success mr-2"></i> Include numbers</li>
+                                            <li><i class="fa fa-check text-success mr-2"></i> Include special characters</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- /.content-wrapper -->
+
+        <!-- Main Footer -->
+        <footer class="main-footer">
+            <?php include('footer.php'); ?>
+        </footer>
+    </div>
+    <!-- ./wrapper -->
+
     <script src="js/jquery-2.1.1.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/plugins/metisMenu/jquery.metisMenu.js"></script>
     <script src="js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-
-    <!-- Custom and plugin javascript -->
     <script src="js/inspinia.js"></script>
-    <script src="js/plugins/pace/pace.min.js"></script>
 
-    <!-- iCheck -->
-    <script src="js/plugins/iCheck/icheck.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                $('.i-checks').iCheck({
-                    checkboxClass: 'icheckbox_square-green',
-                    radioClass: 'iradio_square-green',
-                });
-            });
-        </script>
-		<link rel="stylesheet" href="popup_style.css">
-<?php if(!empty($_SESSION['success'])) {  ?>
-<div class="popup popup--icon -success js_success-popup popup--visible">
-  <div class="popup__background"></div>
-  <div class="popup__content">
-    <h3 class="popup__content__title">
-      <strong>Success</strong> 
-    </h1>
-    <p><?php echo $_SESSION['success']; ?></p>
-    <p>
-      <button class="button button--success" data-for="js_success-popup">Close</button>
-    </p>
-  </div>
-</div>
-<?php unset($_SESSION["success"]);  
-} ?>
-<?php if(!empty($_SESSION['error'])) {  ?>
-<div class="popup popup--icon -error js_error-popup popup--visible">
-  <div class="popup__background"></div>
-  <div class="popup__content">
-    <h3 class="popup__content__title">
-      <strong>Error</strong> 
-    </h1>
-    <p><?php echo $_SESSION['error']; ?></p>
-    <p>
-      <button class="button button--error" data-for="js_error-popup">Close</button>
-    </p>
-  </div>
-</div>
-<?php unset($_SESSION["error"]);  } ?>
+    <!-- AdminLTE App -->
     <script>
-      var addButtonTrigger = function addButtonTrigger(el) {
-  el.addEventListener('click', function () {
-    var popupEl = document.querySelector('.' + el.dataset.for);
-    popupEl.classList.toggle('popup--visible');
-  });
-};
+        $(document).ready(function() {
+            // Initialize push menu widget for sidebar toggle
+            $('[data-widget="pushmenu"]').PushMenu();
 
-Array.from(document.querySelectorAll('button[data-for]')).
-forEach(addButtonTrigger);
+            // Initialize treeview for sidebar navigation
+            $('[data-widget="treeview"]').Treeview('init');
+
+            // Form validation
+            (function() {
+                'use strict';
+                window.addEventListener('load', function() {
+                    var forms = document.getElementsByClassName('needs-validation');
+                    var validation = Array.prototype.filter.call(forms, function(form) {
+                        form.addEventListener('submit', function(event) {
+                            if (form.checkValidity() === false) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        }, false);
+                    });
+                }, false);
+            })();
+
+            // Add ripple effect to buttons
+            $('.btn').on('click', function(e) {
+                let $button = $(this);
+                let circle = $('<span class="ripple"></span>');
+
+                // Remove any existing ripples
+                $button.find('.ripple').remove();
+
+                // Add the ripple to the button
+                $button.append(circle);
+
+                // Position the ripple
+                let xPos = e.pageX - $button.offset().left;
+                let yPos = e.pageY - $button.offset().top;
+
+                circle.css({
+                    top: yPos,
+                    left: xPos
+                });
+
+                // Remove the ripple after the animation
+                setTimeout(function() {
+                    circle.remove();
+                }, 600);
+            });
+
+            // Password visibility toggle
+            $('.toggle-password').on('click', function() {
+                const input = $(this).closest('.input-group').find('input');
+                const icon = $(this).find('i');
+
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            // Password match validation
+            $('#txtconfirm_password').on('input', function() {
+                const newPassword = $('#txtnew_password').val();
+                const confirmPassword = $(this).val();
+
+                if (newPassword !== confirmPassword) {
+                    $(this).removeClass('is-valid').addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid').addClass('is-valid');
+                }
+            });
+        });
     </script>
 </body>
-
 </html>

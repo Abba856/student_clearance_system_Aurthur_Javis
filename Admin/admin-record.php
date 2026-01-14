@@ -3,18 +3,18 @@ session_start();
 error_reporting(0);
 include('../connect.php');
 if(strlen($_SESSION['admin-username'])=="")
-    {   
-    header("Location: login.php"); 
+    {
+    header("Location: login.php");
     }
     else{
 	}
 	$username=$_SESSION['admin-username'];
-	
-	
+
+
 date_default_timezone_set('Africa/Lagos');
-$current_date = date('Y-m-d');	
-	
-$sql = "select * from admin where username='$username'"; 
+$current_date = date('Y-m-d');
+
+$sql = "select * from admin where username='$username'";
 $result = $conn->query($sql);
 $row= mysqli_fetch_array($result);
 ?>
@@ -32,10 +32,10 @@ $row= mysqli_fetch_array($result);
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Tempusdominus Bootstrap 4 -->
-  
+
   <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-  
+
   <link rel="stylesheet" href="plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
   <!-- iCheck -->
   <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
@@ -49,7 +49,10 @@ $row= mysqli_fetch_array($result);
   <link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
   <!-- summernote -->
   <link rel="stylesheet" href="plugins/summernote/summernote-bs4.min.css">
-  
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="css/admin-custom.css">
+  <link rel="stylesheet" href="../css/global-design-system.css">
+
   <script type="text/javascript">
 		function Activate(fullname){
 if(confirm("ARE YOU SURE YOU WISH TO ACTIVATE " + " " + fullname+ "FROM THE SYSTEM ?" ))
@@ -58,7 +61,7 @@ return  true;
 }
 else {return false;
 }
-	 
+
 }
 
 </script>
@@ -71,7 +74,7 @@ return  true;
 }
 else {return false;
 }
-	 
+
 }
 
 </script>
@@ -86,8 +89,8 @@ else {return false;
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>      </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Home</a>      </li>
-      
+        <a href="index.php" class="nav-link">Home</a>      </li>
+
     </ul>
 
     <!-- SEARCH FORM -->
@@ -104,8 +107,8 @@ else {return false;
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
- 
-      
+
+
     </ul>
   </nav>
   <!-- /.navbar -->
@@ -113,8 +116,8 @@ else {return false;
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="#" class="brand-link">
-      <img src="../images/logo.png" alt=" Logo"  width="200" height="111" class="" style="opacity: .8">
+    <a href="index.php" class="brand-link">
+      <img src="../images/logo.png" alt="Logo" width="200" height="111" class="" style="opacity: .8">
 	        <span class="brand-text font-weight-light">  </span>
     </a>
 
@@ -146,13 +149,13 @@ else {return false;
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-         
+
 		 <?php
 			   include('sidebar.php');
-			   
+
 			   ?>
-		 
-		 
+
+
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -167,12 +170,12 @@ else {return false;
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">&nbsp;</h1>
+            <h1 class="m-0 text-dark">Admin Records</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Admin Record</li>
+              <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+              <li class="breadcrumb-item active">Admin Records</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -185,97 +188,102 @@ else {return false;
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
-          <p>&nbsp;</p>
-          <table width="1049" border="0" align="center">
-            <tr>
-              <td width="1043" height="214"><div class="card">
-                <div class="card-header">
-                  <h4>Admin Record </h4>
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">All Admin Records</h3>
+                <div class="card-tools">
+                  <a href="add-admin.php" class="btn btn-primary btn-sm">
+                    <i class="fa fa-plus"></i> Add New Admin
+                  </a>
+                  <a href="index.php" class="btn btn-secondary btn-sm ml-1">
+                    <i class="fa fa-arrow-left"></i> Back to Dashboard
+                  </a>
                 </div>
-                <!-- /.card-header -->
-                <div class="card-body">
-                  <table width="106%" align="center" class="table table-bordered table-striped" id="example1">
-                    <thead>
-                    <tr> <th width="3%"><div align="center">#</div></th>
-                        <th width="13%"><div align="center">Username</div></th>
-							          <th width="8%"><div align="center">Photo</div></th>
-                        <th width="7%"><div align="center">Password</div></th>
-                        <th width="6%"><div align="center">Designation</div></th>
-                        <th width="6%"><div align="center">fullname</div></th>
-                        <th width="8%"><div align="center">Email</div></th>
-						           <th width="8%"><div align="center">Status</div></th>
-                       <th width="16%"><div align="center">Action</div></th>
-                        
-				      </tr>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped" id="example1">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>Photo</th>
+                        <th>Password</th>
+                        <th>Designation</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
                     </thead>
-                      <div align="center"></div>
-                    
                     <tbody>
-                                         <?php 
-                                          $sql = "SELECT * FROM admin order by username ASC";
-                                           $result = $conn->query($sql); 
-										$cnt=1;
-                                           while($row = $result->fetch_assoc()) { ?>
-                      <tr class="gradeX">
-					  <td height="47"><div align="center"><?php echo $cnt; ?></div></td>
-                        <td><div align="center"><?php echo $row['username']; ?></div></td>
-				 <td><div align="center"><span class="controls"><img src="../<?php echo $row['photo'];?>"  width="50" height="43" border="2"/></span></div></td>
-                    <td><div align="center"><?php echo $row['password']; ?></div></td>
-                    <td><div align="center"><?php echo $row['designation']; ?></div></td>
-                     <td><div align="center"><?php echo $row['fullname']; ?></div></td>
-               <td><div align="center"><?php echo $row['email']; ?></div></td>
-                        <td><div align="center"><?php echo $row['status']; ?></div></td>
-                        <td>     <div class="btn-group">
-                    <button type="button" class="btn btn-danger btn-flat">Action</button>
-                    <button type="button" class="btn btn-danger btn-flat dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                      <span class="sr-only">Toggle Dropdown</span>
+                    <?php
+                    $sql = "SELECT * FROM admin ORDER BY username ASC";
+                    $result = $conn->query($sql);
+                    $cnt=1;
+                    while($row = $result->fetch_assoc()) { ?>
+                      <tr>
+                        <td><?php echo $cnt; ?></td>
+                        <td><?php echo htmlspecialchars($row['username']); ?></td>
+                        <td class="text-center">
+                          <img src="../<?php echo $row['photo'];?>" alt="Admin Photo" width="60" height="60" class="rounded-circle img-thumbnail">
+                        </td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['password']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['designation']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['fullname']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['email']); ?></td>
+                        <td class="text-center">
+                          <span class="badge <?php echo ($row['status'] == 'Active') ? 'badge-success' : 'badge-danger'; ?>">
+                            <?php echo $row['status']; ?>
+                          </span>
+                        </td>
+                        <td class="text-center">
+                          <div class="btn-group">
+                    <button type="button" class="btn btn-danger btn-sm dropdown-toggle" data-toggle="dropdown">
+                      Actions
                     </button>
-                    <div class="dropdown-menu" role="menu">
-							      <?php if (($row['status'])==(('Active')))  { ?>
-                      <a class="dropdown-item" href="block-unblock-admin.php?id=<?php echo $row['ID'];?>" onClick="return Deactivate('<?php echo $row['fullname']; ?> ');">Deactivate</a>
-					  <?php } else {?>
-					  <a class="dropdown-item" href="block-unblock-admin.php?uid=<?php echo $row['ID'];?>" onClick="return Activate('<?php echo $row['fullname']; ?> ');">Activate</a>
-					  <?php } ?>
-                      <a class="dropdown-item" href="edit-admin.php?id=<?php echo $row['ID'];?>">Edit</a>
+                    <div class="dropdown-menu">
+                      <?php if (($row['status'])==(('Active')))  { ?>
+                      <a class="dropdown-item" href="block-unblock-admin.php?id=<?php echo $row['ID'];?>" onClick="return Deactivate('<?php echo $row['fullname']; ?> ');">
+                        <i class="fa fa-ban mr-2"></i>Deactivate
+                      </a>
+                      <?php } else {?>
+                      <a class="dropdown-item" href="block-unblock-admin.php?uid=<?php echo $row['ID'];?>" onClick="return Activate('<?php echo $row['fullname']; ?> ');">
+                        <i class="fa fa-check mr-2"></i>Activate
+                      </a>
+                      <?php } ?>
+                      <a class="dropdown-item" href="edit-admin.php?id=<?php echo $row['ID'];?>">
+                        <i class="fa fa-edit mr-2"></i>Edit
+                      </a>
                     </div>
                   </div>
                 </td>
-                    </tr>
-					<?php $cnt=$cnt+1;} ?>
+                      </tr>
+                    <?php $cnt=$cnt+1;} ?>
                     </tbody>
-                    <tfoot>
-                    </tfoot>
                   </table>
-				  
                 </div>
-                <!-- /.card-body -->
               </div>
-                <table width="392" border="0" align="right">
-                  <tr>
-                    <td width="386"></td>
-                  </tr>
-                </table>
-                <p>&nbsp;</p>
-              </td>
-            </tr>
-			
-          </table>
-          <p>
+              <!-- /.card-body -->
+            </div>
             <!-- /.card -->
-          </p>
-        </div>
+          </div>
           <!-- /.col -->
-    </div>
+        </div>
         <!-- /.row -->
-  </div>
-      <!-- /.container-fluid --><!-- /.content -->
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
-      
+      <b>Version</b> 1.0.0
     </div>
- <?php  include('footer.php');   ?>
+    <?php  include('../footer.php');   ?>
   </footer>
 
   <!-- Control Sidebar -->
@@ -305,15 +313,38 @@ else {return false;
     $("#example1").DataTable({
       "responsive": true,
       "autoWidth": false,
+      "language": {
+        "paginate": {
+          "previous": "&laquo;",
+          "next": "&raquo;"
+        }
+      }
     });
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
+    
+    // Add ripple effect to buttons
+    $('.btn').on('click', function(e) {
+      let $button = $(this);
+      let circle = $('<span class="ripple"></span>');
+      
+      // Remove any existing ripples
+      $button.find('.ripple').remove();
+      
+      // Add the ripple to the button
+      $button.append(circle);
+      
+      // Position the ripple
+      let xPos = e.pageX - $button.offset().left;
+      let yPos = e.pageY - $button.offset().top;
+      
+      circle.css({
+        top: yPos,
+        left: xPos
+      });
+      
+      // Remove the ripple after the animation
+      setTimeout(function() {
+        circle.remove();
+      }, 600);
     });
   });
 </script>

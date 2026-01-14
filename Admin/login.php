@@ -50,6 +50,8 @@ $_SESSION['error']=' Wrong Username and Password';
   <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <!-- Global design system -->
+  <link rel="stylesheet" href="../css/global-design-system.css">
   <style type="text/css">
 <!--
 .style2 {

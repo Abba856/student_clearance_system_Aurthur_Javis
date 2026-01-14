@@ -3,315 +3,333 @@ session_start();
 error_reporting(0);
 include('connect.php');
 
-if(empty($_SESSION['matric_no']))
-    {   
-    header("Location: login.php"); 
-    }
-    else{
-	}
+if(empty($_SESSION['matric_no'])) {
+    header("Location: login.php");
+    exit();
+}
 
-    date_default_timezone_set('Africa/Lagos');
-    $current_date = date('Y-m-d H:i:s');
+date_default_timezone_set('Africa/Lagos');
+$current_date = date('Y-m-d H:i:s');
 
-    //get neccesary session details 
+//get necessary session details
 $ID = $_SESSION["ID"];
 $matric_no = $_SESSION["matric_no"];
 $dept = $_SESSION['dept'];
 $faculty = $_SESSION['faculty'];
 
+// Fetch student data
+$sql = "SELECT * FROM students WHERE matric_no=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $matric_no);
+$stmt->execute();
+$result = $stmt->get_result();
+$rowaccess = $result->fetch_assoc();
 
-$sql = "select * from students where matric_no='$matric_no'"; 
-$result = $conn->query($sql);
-$rowaccess = mysqli_fetch_array($result);
-
-
-$sql = "select SUM(amount) as tot_fee from fee where faculty='$faculty' AND dept='$dept'"; 
-$result = $conn->query($sql);
-$row_fee = mysqli_fetch_array($result);
-$tot_fee=$row_fee['tot_fee'];
-
-//Get outstanding paymentetc
-$sql = "select SUM(amount) as tot_pay from payment where studentID='$ID'"; 
-$result = $conn->query($sql);
-$rowpayment = mysqli_fetch_array($result);
-$tot_pay=$rowpayment['tot_pay'];
-
-$outstanding_fee=$tot_fee-$tot_pay;
-
-if(isset($_POST["btnpay"]))
-{
-
-$amt = mysqli_real_escape_string($conn,$_POST['txtamt']);
-
-if ($amt > $outstanding_fee) {
-$_SESSION['error'] ='Amount Can\'t be greater than Outstanding fee ';
-
-}else {
-//save fee details
-
-$permitted_chars = '0123456789ABCDEFR';
-$feeID = substr(str_shuffle($permitted_chars), 0, 12);
-
-$query = "INSERT into `payment` (feeID,studentID,amount,datepaid)
-VALUES ('$feeID','$ID','$amt','$current_date')";
-
-$result = mysqli_query($conn,$query);
-if($result){
-
-header( "refresh:2;url= pay-fee.php" );
-$_SESSION['success'] ='Fee payment Was Sucessfull';
-}else{
-$_SESSION['error'] ='Problem paying Fee';
-
-}
-}
+if (!$rowaccess) {
+    header("Location: login.php");
+    exit();
 }
 
+// Calculate total fees required
+$sql = "SELECT SUM(amount) as tot_fee FROM fee WHERE faculty=? AND dept=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ss", $faculty, $dept);
+$stmt->execute();
+$result = $stmt->get_result();
+$row_fee = $result->fetch_assoc();
+$tot_fee = $row_fee['tot_fee'] ?? 0;
 
+// Calculate total paid
+$sql = "SELECT SUM(amount) as tot_pay FROM payment WHERE studentID=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $ID);
+$stmt->execute();
+$result = $stmt->get_result();
+$rowpayment = $result->fetch_assoc();
+$tot_pay = $rowpayment['tot_pay'] ?? 0;
+
+$outstanding_fee = $tot_fee - $tot_pay;
+
+// Handle payment submission
+if(isset($_POST["btnpay"]) && isset($_POST['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    $amt = floatval($_POST['txtamt']);
+
+    if ($amt <= 0) {
+        $_SESSION['error'] = 'Amount must be greater than zero';
+    } else if ($amt > $outstanding_fee) {
+        $_SESSION['error'] = 'Amount can\'t be greater than Outstanding fee (NGN ' . number_format($outstanding_fee, 2) . ')';
+    } else {
+        // Generate secure payment ID
+        $feeID = bin2hex(random_bytes(6)); // 12 character hex string
+
+        // Insert payment record
+        $insert_sql = "INSERT INTO payment (feeID, studentID, amount, datepaid) VALUES (?, ?, ?, ?)";
+        $insert_stmt = $conn->prepare($insert_sql);
+        $insert_stmt->bind_param("ssss", $feeID, $ID, $amt, $current_date);
+
+        if($insert_stmt->execute()) {
+            $_SESSION['success'] = 'Fee payment was successful';
+            // Refresh page to show updated amounts
+            header("Location: pay-fee.php");
+            exit();
+        } else {
+            $_SESSION['error'] = 'Problem processing payment. Please try again.';
+        }
+    }
+}
+
+// Generate CSRF token if it doesn't exist
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 ?>
 
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Fee Payment | Online Student clearance system</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
-
-    <!-- Morris -->
-    <link href="css/plugins/morris/morris-0.4.3.min.css" rel="stylesheet">
-
-    <!-- Gritter -->
-    <link href="js/plugins/gritter/jquery.gritter.css" rel="stylesheet">
-
-    <link href="css/animate.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-<link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
-
-<script type="text/javascript">
-		function confirmpayment(){
-if(confirm("ARE YOU SURE YOU WISH TO PAY NOW ?" ))
-{
-return  true;
-}
-else {return false;
-}
-	 
-}
-</script>
-<script>
-    if ( window.history.replaceState ) {
-        window.history.replaceState( null, null, window.location.href );
-    }
-</script>
-<style type="text/css">
-<!--
-.style1 {color: #000000}
--->
-</style>
+    <link href="css/dashboard-style.css" rel="stylesheet">
+    <link href="css/global-design-system.css" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
 </head>
 
-<body>
-<div id="wrapper">
-
-<nav class="navbar-default navbar-static-side" role="navigation">
-    <div class="sidebar-collapse">
-        <ul class="nav metismenu" id="side-menu">
-            <li class="nav-header">
-                <div class="dropdown profile-element"> <span>
-                        <img src="<?php echo $rowaccess['photo'];  ?>" alt="image" width="142" height="153" class="img-circle" />
-                         </span>
-
-
-                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                        <span class="clear"><span class="text-muted text-xs block">Matric No:<?php echo $rowaccess['matric_no'];  ?> <b class="caret"></b></span> </span> </a>
-                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
-                        
-                        <li><a href="logout.php">Logout</a></li>
-                    </ul>
-</div>	
-             
-           <?php
-           include('sidebar.php');
-			   
-			   ?>
-			   
-	       </ul>
-
-        </div>
-    </nav>
-
-        <div id="page-wrapper" class="gray-bg">
-        <div class="row border-bottom">
-        <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0">
-        <div class="navbar-header">
-            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
-            
-        </div>
-            <ul class="nav navbar-top-links navbar-right">
-                <li>
-
-				<span class="m-r-sm text-muted welcome-message">Welcome <?php echo $rowaccess['fullname'];  ?></span>
-
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
-                <li class="dropdown">
-                                     
-                <li>
-                    <a href="logout.php">
-                        <i class="fa fa-sign-out"></i> Log out
-                    </a>
-                </li>
-               
             </ul>
-
-        </nav>
-
-
-        </div>
-            <div class="row wrapper border-bottom white-bg page-heading">
-                <div class="col-lg-10">
-                    <h2></h2>
-                    <ol class="breadcrumb">
-                        <li>
-                            <a href="index.php">Home</a>
-                        </li>
-                       
-                        <li class="active"><strong>Fee </strong></li>
-                    </ol>
-                </div>
-                <div class="col-lg-2">
-
-                </div>
-            </div>
-        <div class="wrapper wrapper-content animated fadeInRight">
-            <div class="row">
-            <div class="col-lg-7">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-title">
-                        <h5></h5>
-                        <div class="ibox-tools">
-                            <a class="collapse-link">
-                                <i class="fa fa-chevron-up"></i>
-                            </a>
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                <i class="fa fa-wrench"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">Config option 1</a>
-                                </li>
-                                <li><a href="#">Config option 2</a>
-                                </li>
-                            </ul>
-                            <a class="close-link">
-                                <i class="fa fa-times"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="ibox-content">
-                        <div class="row">
-                            <div class="col-sm-6 b-r">
-                                <form role="form" method="POST">
-                                    <div class="form-group"><strong>
-                                    <label>Amount</label></strong>
-                                            <input type="number" size="77" name="txtamt"  placeholder="Enter Amount to Pay" class="form-control" required="">
-                                    </div>
-									  <div>
-
-										<button name="btnpay" class="btn btn-primary btn-block m" onClick="return confirmpayment();"><i class="fa fa-credit-card"></i> Pay</button>
-                                    </div>
-                                </form>
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="far fa-user"></i>
+                        <span class="badge badge-danger navbar-badge"><?php echo htmlspecialchars($rowaccess['fullname']); ?></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <div class="dropdown-item">
+                            <div class="media">
+                                <img src="<?php echo $rowaccess['photo']; ?>" alt="User Avatar" class="img-size-50 mr-3 img-circle">
+                                <div class="media-body">
+                                    <h3 class="dropdown-item-title"><?php echo htmlspecialchars($rowaccess['fullname']); ?></h3>
+                                    <p class="text-sm"><?php echo htmlspecialchars($rowaccess['matric_no']); ?></p>
+                                </div>
                             </div>
-                            <div class="col-sm-6">
-                                
-                                <p class="text-center">&nbsp;</p>
-                                <p class="text-center style1"><strong>SCHOOL FEES :</strong>    <span class="badge badge-info">NGN<?php echo number_format((float) $tot_fee ,2); ?></span></p>
-                                <p class="text-center style1"><strong>TOTAL PAID :</strong>  <span class="badge badge-warning">NGN<?php echo number_format((float) $tot_pay ,2); ?></span>   </p>
-                                <p class="text-center style1"><strong>OUTSTANDING FEE :</strong>  <span class="badge badge-primary">NGN<?php echo number_format((float) $outstanding_fee ,2); ?></span>   </p>
-                                
-                          </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="logout.php" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="index.php" class="brand-link">
+                <img src="images/logo.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8; width: auto; height: 40px;">
+                <span class="brand-text font-weight-light">Student Portal</span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <?php
+                include('sidebar.php');
+                ?>
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">Fee Payment</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+                                <li class="breadcrumb-item active">Fee Payment</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
             </div>
-              <div class="col-lg-5"></div>
-            </div>
-            <div class="row"></div>
-        </div>
-        <div class="footer">
-            <div class="pull-right"></div>
-            <div><?php  include('../footer.php'); ?></div>
-        </div>
 
-        </div>
-        </div>
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card card-primary">
+                                <div class="card-header">
+                                    <h3 class="card-title">Make Payment</h3>
+                                </div>
+                                <div class="card-body">
+                                    <?php if(!empty($_SESSION['success'])) { ?>
+                                        <div class="alert alert-success alert-dismissible">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <h5><i class="icon fas fa-check"></i> Success!</h5>
+                                            <?php echo $_SESSION['success']; unset($_SESSION["success"]); ?>
+                                        </div>
+                                    <?php } ?>
 
+                                    <?php if(!empty($_SESSION['error'])) { ?>
+                                        <div class="alert alert-danger alert-dismissible">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                            <h5><i class="icon fas fa-ban"></i> Error!</h5>
+                                            <?php echo $_SESSION['error']; unset($_SESSION["error"]); ?>
+                                        </div>
+                                    <?php } ?>
 
-    <!-- Mainly scripts -->
+                                    <form role="form" method="POST" class="needs-validation" novalidate>
+                                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+
+                                        <div class="form-group">
+                                            <label for="txtamt"><strong>Amount to Pay (NGN)</strong></label>
+                                            <input type="number"
+                                                   name="txtamt"
+                                                   id="txtamt"
+                                                   placeholder="Enter Amount to Pay"
+                                                   class="form-control"
+                                                   min="1"
+                                                   max="<?php echo $outstanding_fee; ?>"
+                                                   step="0.01"
+                                                   required>
+                                            <div class="invalid-feedback">
+                                                Please enter a valid amount to pay
+                                            </div>
+                                            <small class="form-text text-muted">
+                                                Maximum amount you can pay: NGN <?php echo number_format($outstanding_fee, 2); ?>
+                                            </small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <button type="submit"
+                                                    name="btnpay"
+                                                    class="btn btn-primary btn-block"
+                                                    onclick="return confirm('Are you sure you want to make this payment?');">
+                                                <i class="fa fa-credit-card mr-2"></i> Make Payment
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card card-info">
+                                <div class="card-header">
+                                    <h3 class="card-title">Financial Summary</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="info-box mb-4">
+                                        <span class="info-box-icon bg-primary elevation-1">
+                                            <i class="fa fa-graduation-cap"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Total Fees Required</span>
+                                            <span class="info-box-number">NGN <?php echo number_format($tot_fee, 2); ?></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-box mb-4">
+                                        <span class="info-box-icon bg-success elevation-1">
+                                            <i class="fa fa-money-bill-wave"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Amount Paid</span>
+                                            <span class="info-box-number">NGN <?php echo number_format($tot_pay, 2); ?></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-box mb-4">
+                                        <span class="info-box-icon bg-warning elevation-1">
+                                            <i class="fa fa-calculator"></i>
+                                        </span>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Outstanding Fee</span>
+                                            <span class="info-box-number">NGN <?php echo number_format($outstanding_fee, 2); ?></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4 p-3 bg-light rounded">
+                                        <h5 class="text-center">Payment Instructions</h5>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fa fa-check text-success mr-2"></i> Enter amount you wish to pay</li>
+                                            <li><i class="fa fa-check text-success mr-2"></i> Amount cannot exceed outstanding fee</li>
+                                            <li><i class="fa fa-check text-success mr-2"></i> Multiple payments allowed</li>
+                                            <li><i class="fa fa-check text-success mr-2"></i> Full payment completes fee clearance</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- /.content-wrapper -->
+
+        <!-- Main Footer -->
+        <footer class="main-footer">
+            <?php include('footer.php'); ?>
+        </footer>
+    </div>
+    <!-- ./wrapper -->
+
     <script src="js/jquery-2.1.1.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/plugins/metisMenu/jquery.metisMenu.js"></script>
     <script src="js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-
-    <!-- Custom and plugin javascript -->
     <script src="js/inspinia.js"></script>
-    <script src="js/plugins/pace/pace.min.js"></script>
 
-    <!-- iCheck -->
-    <script src="js/plugins/iCheck/icheck.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                $('.i-checks').iCheck({
-                    checkboxClass: 'icheckbox_square-green',
-                    radioClass: 'iradio_square-green',
-                });
-            });
-        </script>
-		<link rel="stylesheet" href="popup_style.css">
-<?php if(!empty($_SESSION['success'])) {  ?>
-<div class="popup popup--icon -success js_success-popup popup--visible">
-  <div class="popup__background"></div>
-  <div class="popup__content">
-    <h3 class="popup__content__title">
-      <strong>Success</strong> 
-    </h1>
-    <p><?php echo $_SESSION['success']; ?></p>
-    <p>
-      <button class="button button--success" data-for="js_success-popup">Close</button>
-    </p>
-  </div>
-</div>
-<?php unset($_SESSION["success"]);  
-} ?>
-<?php if(!empty($_SESSION['error'])) {  ?>
-<div class="popup popup--icon -error js_error-popup popup--visible">
-  <div class="popup__background"></div>
-  <div class="popup__content">
-    <h3 class="popup__content__title">
-      <strong>Error</strong> 
-    </h1>
-    <p><?php echo $_SESSION['error']; ?></p>
-    <p>
-      <button class="button button--error" data-for="js_error-popup">Close</button>
-    </p>
-  </div>
-</div>
-<?php unset($_SESSION["error"]);  } ?>
+    <!-- AdminLTE App -->
     <script>
-      var addButtonTrigger = function addButtonTrigger(el) {
-  el.addEventListener('click', function () {
-    var popupEl = document.querySelector('.' + el.dataset.for);
-    popupEl.classList.toggle('popup--visible');
-  });
-};
+        $(document).ready(function() {
+            // Initialize push menu widget for sidebar toggle
+            $('[data-widget="pushmenu"]').PushMenu();
 
-Array.from(document.querySelectorAll('button[data-for]')).
-forEach(addButtonTrigger);
+            // Initialize treeview for sidebar navigation
+            $('[data-widget="treeview"]').Treeview('init');
+
+            // Form validation
+            (function() {
+                'use strict';
+                window.addEventListener('load', function() {
+                    var forms = document.getElementsByClassName('needs-validation');
+                    var validation = Array.prototype.filter.call(forms, function(form) {
+                        form.addEventListener('submit', function(event) {
+                            if (form.checkValidity() === false) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        }, false);
+                    });
+                }, false);
+            })();
+
+            // Prevent resubmission on refresh
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        });
     </script>
 </body>
-
 </html>

@@ -5,14 +5,14 @@
  include('../connect2.php');
 
 $username=$_SESSION['admin-username'];
-$sql = "select * from admin where username='$username'"; 
+$sql = "select * from admin where username='$username'";
 $result = $conn->query($sql);
 $row1= mysqli_fetch_array($result);
 
 date_default_timezone_set('Africa/Lagos');
 $current_date = date('Y-m-d H:i:s');
 
- 
+
 if(isset($_POST["btnAdd"]))
 {
 
@@ -61,6 +61,9 @@ $_SESSION['error'] ='Problem Adding fee';
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="css/admin-custom.css">
+  <link rel="stylesheet" href="../css/global-design-system.css">
 
   <script type="text/javascript">
 		function deldata(){
@@ -70,7 +73,7 @@ return  true;
 }
 else {return false;
 }
-	 
+
 }
 
 </script>
@@ -85,8 +88,8 @@ else {return false;
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>      </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Home</a>      </li>
-      
+        <a href="index.php" class="nav-link">Home</a>      </li>
+
     </ul>
 
     <!-- SEARCH FORM -->
@@ -103,8 +106,8 @@ else {return false;
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
- 
-      
+
+
     </ul>
   </nav>
   <!-- /.navbar -->
@@ -113,7 +116,7 @@ else {return false;
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="index.php" class="brand-link">
-      <img src="../images/logo.png" alt=" Logo"  width="200" height="111" class="" style="opacity: .8">
+      <img src="../images/logo.png" alt="Logo" width="200" height="111" class="" style="opacity: .8">
 	  <span class="brand-text font-weight-light"></span>
     </a>
 
@@ -145,13 +148,13 @@ else {return false;
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-         
+
 		 <?php
 			   include('sidebar.php');
-			   
+
 			   ?>
-		 
-		 
+
+
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -165,10 +168,11 @@ else {return false;
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
+            <h1>Add Fee</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item"><a href="index.php">Home</a></li>
               <li class="breadcrumb-item active">Add Fee</li>
             </ol>
           </div>
@@ -189,10 +193,10 @@ else {return false;
               </div>
               <!-- /.card-header -->
               <!-- form start -->
-              <form id="form" action="" method="post" class="">
+              <form id="form" action="" method="post" class="needs-validation" novalidate>
                 <div class="card-body">
                   <div class="form-group">
-                    <label for="exampleInputEmail1">Session </label>
+                    <label for="cmdsession">Session</label>
                     <?php
 //Our select statement. This will retrieve the data that we want.
 $sql = "SELECT * FROM tblsession";
@@ -203,47 +207,68 @@ $stmt->execute();
 //Retrieve the rows using fetchAll.
 $sessions = $stmt->fetchAll();
 ?>
-      <select name="cmdsession" id="select" class="form-control" required="">
+      <select name="cmdsession" id="cmdsession" class="form-control" required="">
+        <option value="">Select Session</option>
     <?php foreach($sessions as $row_session): ?>
         <option value="<?= $row_session['session']; ?>"><?= $row_session['session']; ?></option>
     <?php endforeach; ?>
-</select>               
+</select>
+<div class="invalid-feedback">
+  Please select a session
+</div>
    </div>
-				     <div class="form-group">
-                    <label for="exampleInputPassword1">Faculty</label>
-                    <select name="cmdfaculty" id="select" class="form-control" required="">
-    <option value="Select faculty">Select faculty</option>
-   <option value="Science">Science</option>
-   <option value="Engineering">Engineering</option>
-   <option value="Social Science">Social Science</option>
-   </select>  
-     </div>
+   
+   <div class="form-group">
+                    <label for="cmdfaculty">Faculty</label>
+                    <select name="cmdfaculty" id="cmdfaculty" class="form-control" required="">
+                      <option value="">Select Faculty</option>
+                      <option value="Science">Science</option>
+                      <option value="Engineering">Engineering</option>
+                      <option value="Social Science">Social Science</option>
+                      <option value="Arts">Arts</option>
+                      <option value="Law">Law</option>
+                      <option value="Medicine">Medicine</option>
+                    </select>
+                    <div class="invalid-feedback">
+                      Please select a faculty
+                    </div>
+                  </div>
+				  
 				  <div class="form-group">
-                    <label for="exampleInputPassword1">Department</label>
-                    <select name="cmddept" id="select" class="form-control" required="">
-    <option value="Select Department">Select Department</option>
-   <option value="Computer Science">Computer Science</option>
-   <option value="Electrical Engineering">Electrical Engineering</option>
-   <option value="Business Management">Business Management</option>
-   <option value="Information Technology">Information Technology</option>
-   </select>  
-    </div>
+                    <label for="cmddept">Department</label>
+                    <select name="cmddept" id="cmddept" class="form-control" required="">
+                      <option value="">Select Department</option>
+                      <option value="Computer Science">Computer Science</option>
+                      <option value="Electrical Engineering">Electrical Engineering</option>
+                      <option value="Business Management">Business Management</option>
+                      <option value="Information Technology">Information Technology</option>
+                      <option value="Mathematics">Mathematics</option>
+                      <option value="Physics">Physics</option>
+                      <option value="Chemistry">Chemistry</option>
+                      <option value="Biology">Biology</option>
+                    </select>
+                    <div class="invalid-feedback">
+                      Please select a department
+                    </div>
+                  </div>
 
                   <div class="form-group">
-                    <label for="exampleInputEmail1">Amount (NGN) </label>
-                    <input type="text" class="form-control" name="txtamt" id="exampleInputEmail1" size="77" value="<?php if (isset($_POST['txtamt']))?><?php echo $_POST['txtamt']; ?>" placeholder="Enter Amount">
+                    <label for="txtamt">Amount (NGN)</label>
+                    <input type="number" class="form-control" name="txtamt" id="txtamt" value="<?php if (isset($_POST['txtamt'])) echo $_POST['txtamt']; ?>" placeholder="Enter Amount" required>
+                    <div class="invalid-feedback">
+                      Please enter a valid amount
+                    </div>
                   </div>
-                
-		   </div>
+                </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                  <button type="submit" name="btnAdd" class="btn btn-primary">Add</button>
+                  <button type="submit" name="btnAdd" class="btn btn-primary btn-block">
+                    <i class="fa fa-plus mr-2"></i> Add Fee
+                  </button>
                 </div>
               </form>
             </div>
             <!-- /.card -->
-
-           
           </div>
           <!--/.col (left) -->
           <!-- right column -->
@@ -252,68 +277,58 @@ $sessions = $stmt->fetchAll();
             <div class="card card-warning">
               <div class="card-header">
                 <h3 class="card-title">Fee Structure</h3>
+                <div class="card-tools">
+                  <a href="fee-record.php" class="btn btn-primary btn-sm">
+                    <i class="fa fa-list"></i> View All Fees
+                  </a>
+                </div>
               </div>
               <!-- /.card-header -->
               <div class="card-body">
-                  <table width="106%" align="center" class="table table-bordered table-striped" id="example1">
-                    <thead>
-                    <tr> <th width="3%"><div align="center">#</div></th>
-                        <th width="13%"><div align="center">Faculty</div></th>
-							          <th width="8%"><div align="center">Department</div></th>
-                        <th width="7%"><div align="center">Session</div></th>
-                        <th width="6%"><div align="center">Amount</div></th>
-                        <th width="6%"><div align="center">Action</div></th>
-
-                        </tr>
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped" id="example1">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Faculty</th>
+                        <th>Department</th>
+                        <th>Session</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                    </tr>
                     </thead>
-                      <div align="center"></div>
-                    
                     <tbody>
-                                         <?php 
-                                          $sql = "SELECT * FROM fee order by session ASC";
-                                           $result = $conn->query($sql); 
-										$cnt=1;
-                                           while($row = $result->fetch_assoc()) { ?>
-                      <tr class="gradeX">
-					  <td height="47"><div align="center"><?php echo $cnt; ?></div></td>
-                        <td><div align="center"><?php echo $row['faculty']; ?></div></td>
-                    <td><div align="center"><?php echo $row['dept']; ?></div></td>
-                    <td><div align="center"><?php echo $row['session']; ?></div></td>
-                     <td><div align="center">NGN<?php echo number_format((float) $row['amount'] ,2); ?></div></td>
-                     <td>     <div class="btn-group">
-                    <button type="button" class="btn btn-danger btn-flat">Action</button>
-                    <button type="button" class="btn btn-danger btn-flat dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                      <span class="sr-only">Toggle Dropdown</span>
+                    <?php
+                    $sql = "SELECT * FROM fee ORDER BY session ASC";
+                    $result = $conn->query($sql);
+                    $cnt=1;
+                    while($row = $result->fetch_assoc()) { ?>
+                      <tr>
+                        <td><?php echo $cnt; ?></td>
+                        <td><?php echo htmlspecialchars($row['faculty']); ?></td>
+                        <td><?php echo htmlspecialchars($row['dept']); ?></td>
+                        <td><?php echo htmlspecialchars($row['session']); ?></td>
+                        <td><strong>NGN<?php echo number_format((float) $row['amount'], 2); ?></strong></td>
+                        <td>
+                          <div class="btn-group">
+                    <button type="button" class="btn btn-danger btn-sm dropdown-toggle" data-toggle="dropdown">
+                      Actions
                     </button>
-                    <div class="dropdown-menu" role="menu">
-							     
-                      <a class="dropdown-item" href="delete-fee.php?id=<?php echo $row['ID'];?>" onClick="return deldata();">Delete</a>
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" href="delete-fee.php?id=<?php echo $row['ID'];?>" onClick="return deldata();">
+                        <i class="fa fa-trash mr-2"></i>Delete
+                      </a>
                     </div>
                   </div>
                 </td>
-                    </tr>
-					<?php $cnt=$cnt+1;} ?>
+                      </tr>
+                    <?php $cnt=$cnt+1;} ?>
                     </tbody>
-                    <tfoot>
-                    </tfoot>
                   </table>
-				  
                 </div>
-                <!-- /.card-body -->
               </div>
-                <table width="392" border="0" align="right">
-                  <tr>
-                    <td width="386"></td>
-                  </tr>
-                </table>
-                <p>&nbsp;</p>
-              </td>
-            </tr>
-			
-          </table>
-          <p>
-            <!-- /.card -->
-                     <!-- /.card -->
+              <!-- /.card-body -->
+            </div>
           </div>
           <!--/.col (right) -->
         </div>
@@ -325,9 +340,9 @@ $sessions = $stmt->fetchAll();
   <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
-      
+      <b>Version</b> 1.0.0
     </div>
-    <strong><?php include '../footer.php' ?>
+    <strong><?php include '../footer.php' ?></strong>
   </footer>
 
   <!-- Control Sidebar -->
@@ -352,6 +367,49 @@ $sessions = $stmt->fetchAll();
 <script>
 $(function () {
   bsCustomFileInput.init();
+  
+  // Form validation
+  (function() {
+    'use strict';
+    window.addEventListener('load', function() {
+      var forms = document.getElementsByClassName('needs-validation');
+      var validation = Array.prototype.filter.call(forms, function(form) {
+        form.addEventListener('submit', function(event) {
+          if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    }, false);
+  })();
+  
+  // Add ripple effect to buttons
+  $('.btn').on('click', function(e) {
+    let $button = $(this);
+    let circle = $('<span class="ripple"></span>');
+    
+    // Remove any existing ripples
+    $button.find('.ripple').remove();
+    
+    // Add the ripple to the button
+    $button.append(circle);
+    
+    // Position the ripple
+    let xPos = e.pageX - $button.offset().left;
+    let yPos = e.pageY - $button.offset().top;
+    
+    circle.css({
+      top: yPos,
+      left: xPos
+    });
+    
+    // Remove the ripple after the animation
+    setTimeout(function() {
+      circle.remove();
+    }, 600);
+  });
 });
 </script>
 
@@ -361,7 +419,7 @@ $(function () {
   <div class="popup__background"></div>
   <div class="popup__content">
     <h3 class="popup__content__title">
-      <strong>Success</strong> 
+      <strong>Success</strong>
     </h1>
     <p><?php echo $_SESSION['success']; ?></p>
     <p>
@@ -369,14 +427,14 @@ $(function () {
     </p>
   </div>
 </div>
-<?php unset($_SESSION["success"]);  
+<?php unset($_SESSION["success"]);
 } ?>
 <?php if(!empty($_SESSION['error'])) {  ?>
 <div class="popup popup--icon -error js_error-popup popup--visible">
   <div class="popup__background"></div>
   <div class="popup__content">
     <h3 class="popup__content__title">
-      <strong>Error</strong> 
+      <strong>Error</strong>
     </h1>
     <p><?php echo $_SESSION['error']; ?></p>
     <p>

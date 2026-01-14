@@ -3,18 +3,18 @@ session_start();
 error_reporting(0);
 include('../connect.php');
 if(empty($_SESSION['admin-username']))
-    {   
-    header("Location: login.php"); 
+    {
+    header("Location: login.php");
     }
     else{
 	}
 	$username=$_SESSION['admin-username'];
-	
-	
+
+
 date_default_timezone_set('Africa/Lagos');
-$current_date = date('Y-m-d');	
-	
-$sql = "select * from admin where username='$username'"; 
+$current_date = date('Y-m-d');
+
+$sql = "select * from admin where username='$username'";
 $result = $conn->query($sql);
 $row= mysqli_fetch_array($result);
 
@@ -33,10 +33,10 @@ $row= mysqli_fetch_array($result);
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Tempusdominus Bootstrap 4 -->
-  
+
   <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-  
+
   <link rel="stylesheet" href="plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
   <!-- iCheck -->
   <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
@@ -50,47 +50,21 @@ $row= mysqli_fetch_array($result);
   <link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
   <!-- summernote -->
   <link rel="stylesheet" href="plugins/summernote/summernote-bs4.min.css">
-  
- <script type="text/javascript">
-function Activate(fullname){
-if(confirm("ARE YOU SURE YOU WISH TO Activate " + " " + username+ " " + " ON THE LIST?"))
-{
-return  true;
-}
-else {return false;
-}
-	 
-}
-</script>
-<script type="text/javascript">
-function Deactivate(fullname){
-if(confirm("ARE YOU SURE YOU WISH TO Deactivate " + " " + username+ " " + " ON THE LIST?"))
-{
-return  true;
-}
-else {return false;
-}
-	 
-}
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="css/admin-custom.css">
+  <link rel="stylesheet" href="../css/global-design-system.css">
 
-</script>
-<script type="text/javascript">
-		function deldata(fullname){
+ <script type="text/javascript">
+function deldata(fullname){
 if(confirm("ARE YOU SURE YOU WISH TO DELETE " + " " + fullname+ "FROM THE DATABASE ?" ))
 {
 return  true;
 }
 else {return false;
 }
-	 
-}
 
+}
 </script>
-  <style type="text/css">
-<!--
-.style7 {vertical-align:middle; cursor:pointer; -webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none; border:1px solid transparent; padding:.375rem .75rem; line-height:1.5; border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out; display: inline-block; color: #212529; text-align: center;}
--->
-  </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -102,8 +76,8 @@ else {return false;
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>      </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Home</a>      </li>
-      
+        <a href="index.php" class="nav-link">Home</a>      </li>
+
     </ul>
 
     <!-- SEARCH FORM -->
@@ -120,8 +94,8 @@ else {return false;
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
- 
-      
+
+
     </ul>
   </nav>
   <!-- /.navbar -->
@@ -129,8 +103,8 @@ else {return false;
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="#" class="brand-link">
-      <img src="../images/logo.png" alt=" Logo"  width="200" height="111" class="" style="opacity: .8">
+    <a href="index.php" class="brand-link">
+      <img src="../images/logo.png" alt="Logo" width="200" height="111" class="" style="opacity: .8">
 	        <span class="brand-text font-weight-light">  </span>
     </a>
 
@@ -162,13 +136,13 @@ else {return false;
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-         
+
 		 <?php
 			   include('sidebar.php');
-			   
+
 			   ?>
-		 
-		 
+
+
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -183,12 +157,12 @@ else {return false;
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">&nbsp;</h1>
+            <h1 class="m-0 text-dark">Student Records</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Student Record</li>
+              <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+              <li class="breadcrumb-item active">Student Records</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -201,90 +175,88 @@ else {return false;
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
-          <p>&nbsp;</p>
-          <table width="1204" height="227" border="0" align="center">
-            <tr>
-              <td width="1090" height="184"><div class="card">
-                <div class="card-header">
-                  <h4>Student Record </h4>
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">All Student Records</h3>
+                <div class="card-tools">
+                  <a href="add-student.php" class="btn btn-primary btn-sm">
+                    <i class="fa fa-plus"></i> Add New Student
+                  </a>
+                  <a href="index.php" class="btn btn-secondary btn-sm ml-1">
+                    <i class="fa fa-arrow-left"></i> Back to Dashboard
+                  </a>
                 </div>
-                <!-- /.card-header -->
-                <div class="card-body">
-                  <table width="85%" align="center" class="table table-bordered table-striped" id="example1">
-                    <thead>
-                    <th width="10%"><div align="center">Fullname</div></th>
-							          <th width="7%"><div align="center">Photo</div></th>
-                        <th width="5%"><div align="center">Phone</div></th>
-                        <th width="5%"><div align="center">Matric No</div></th>
-                        <th width="5%"><div align="center">Password</div></th>
-                        <th width="6%"><div align="center">Faculty</div></th>
-						           <th width="5%"><div align="center">Dept</div></th>
-                       <th width="5%"><div align="center">Action</div></th>
-
-				     						    </tr>
-                    </thead>
-                      <div align="center"></div>
-                    
-                    <tbody>
-                                      <?php 
-                                          $sql = "SELECT * FROM students order by ID ASC";
-                                           $result = $conn->query($sql);
-                                           while($row = $result->fetch_assoc()) { ?>
-                      <tr class="gradeX">
-                        <td height="104"><div align="center"><?php echo $row['fullname']; ?> </div></td>
-					 <td><div align="center"><span class="controls"><img src="../<?php echo $row['photo'];?>"  width="91" height="73" border="2"/></span></div></td>
-                        <td><div align="center"><?php echo $row['phone']; ?></div></td>
-                        <td><div align="center"><?php echo $row['matric_no']; ?></div></td>
-                        <td><div align="center"><?php echo $row['password']; ?></div></td>
-                        <td><div align="center"><?php echo $row['faculty']; ?></div></td>
-                        <td><div align="center"><?php echo $row['dept']; ?></div></td>
-                        <td>     <div class="btn-group">
-                    <button type="button" class="btn btn-danger btn-flat">Action</button>
-                    <button type="button" class="btn btn-danger btn-flat dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                      <span class="sr-only">Toggle Dropdown</span>
-                    </button>
-                    <div class="dropdown-menu" role="menu">
-                      <a class="dropdown-item" href="delete-student.php?id=<?php echo $row['ID'];?>" onClick="return deldata('<?php echo $row['fullname']; ?> ');">Delete</a>
-					 
-                    </div>
-                  </div>
-                </td>
-                    </tr>
-					<?php } ?>
-                    </tbody>
-                    <tfoot>
-                    </tfoot>
-                  </table>
-				  
-                </div>
-                <!-- /.card-body -->
               </div>
-                <table width="392" border="0" align="right">
-                  <tr>
-                    <td width="386"></td>
-                  </tr>
-                </table>
-                <p>&nbsp;</p>
-              </td>
-            </tr>
-			
-          </table>
-          <p>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped" id="example1">
+                    <thead class="thead-light">
+                    <tr>
+                      <th>Full Name</th>
+                      <th>Photo</th>
+                      <th>Phone</th>
+                      <th>Matric No</th>
+                      <th>Password</th>
+                      <th>Faculty</th>
+                      <th>Department</th>
+                      <th>Session</th>
+                      <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $sql = "SELECT * FROM students ORDER BY ID ASC";
+                    $result = $conn->query($sql);
+                    while($row = $result->fetch_assoc()) { ?>
+                      <tr>
+                        <td><?php echo htmlspecialchars($row['fullname']); ?></td>
+                        <td class="text-center">
+                          <img src="../<?php echo $row['photo'];?>" alt="Student Photo" width="60" height="60" class="rounded-circle img-thumbnail">
+                        </td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['phone']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['matric_no']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['password']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['faculty']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['dept']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['session']); ?></td>
+                        <td class="text-center">
+                          <div class="btn-group">
+                            <button type="button" class="btn btn-danger btn-sm dropdown-toggle" data-toggle="dropdown">
+                              Actions
+                            </button>
+                            <div class="dropdown-menu">
+                              <a class="dropdown-item" href="delete-student.php?id=<?php echo $row['ID'];?>" onClick="return deldata('<?php echo $row['fullname']; ?>');">
+                                <i class="fa fa-trash mr-2"></i>Delete
+                              </a>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    <?php } ?>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <!-- /.card-body -->
+            </div>
             <!-- /.card -->
-          </p>
-        </div>
+          </div>
           <!-- /.col -->
-    </div>
+        </div>
         <!-- /.row -->
-  </div>
-      <!-- /.container-fluid --><!-- /.content -->
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
-      
+      <b>Version</b> 1.0.0
     </div>
- <?php  include('../footer.php');   ?>
+    <?php  include('../footer.php');   ?>
   </footer>
 
   <!-- Control Sidebar -->
@@ -314,15 +286,38 @@ else {return false;
     $("#example1").DataTable({
       "responsive": true,
       "autoWidth": false,
+      "language": {
+        "paginate": {
+          "previous": "&laquo;",
+          "next": "&raquo;"
+        }
+      }
     });
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
+
+    // Add ripple effect to buttons
+    $('.btn').on('click', function(e) {
+      let $button = $(this);
+      let circle = $('<span class="ripple"></span>');
+
+      // Remove any existing ripples
+      $button.find('.ripple').remove();
+
+      // Add the ripple to the button
+      $button.append(circle);
+
+      // Position the ripple
+      let xPos = e.pageX - $button.offset().left;
+      let yPos = e.pageY - $button.offset().top;
+
+      circle.css({
+        top: yPos,
+        left: xPos
+      });
+
+      // Remove the ripple after the animation
+      setTimeout(function() {
+        circle.remove();
+      }, 600);
     });
   });
 </script>

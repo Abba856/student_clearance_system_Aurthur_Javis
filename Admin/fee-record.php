@@ -3,18 +3,18 @@ session_start();
 error_reporting(0);
 include('../connect.php');
 if(empty($_SESSION['admin-username']))
-    {   
-    header("Location: login.php"); 
+    {
+    header("Location: login.php");
     }
     else{
 	}
 	$username=$_SESSION['admin-username'];
-	
-	
+
+
 date_default_timezone_set('Africa/Lagos');
-$current_date = date('Y-m-d');	
-	
-$sql = "select * from admin where username='$username'"; 
+$current_date = date('Y-m-d');
+
+$sql = "select * from admin where username='$username'";
 $result = $conn->query($sql);
 $row= mysqli_fetch_array($result);
 
@@ -33,10 +33,10 @@ $row= mysqli_fetch_array($result);
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- Tempusdominus Bootstrap 4 -->
-  
+
   <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-  
+
   <link rel="stylesheet" href="plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
   <!-- iCheck -->
   <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
@@ -50,13 +50,9 @@ $row= mysqli_fetch_array($result);
   <link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
   <!-- summernote -->
   <link rel="stylesheet" href="plugins/summernote/summernote-bs4.min.css">
-  
- 
-  <style type="text/css">
-<!--
-.style7 {vertical-align:middle; cursor:pointer; -webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none; border:1px solid transparent; padding:.375rem .75rem; line-height:1.5; border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out; display: inline-block; color: #212529; text-align: center;}
--->
-  </style>
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="css/admin-custom.css">
+  <link rel="stylesheet" href="../css/global-design-system.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -68,8 +64,8 @@ $row= mysqli_fetch_array($result);
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>      </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Home</a>      </li>
-      
+        <a href="index.php" class="nav-link">Home</a>      </li>
+
     </ul>
 
     <!-- SEARCH FORM -->
@@ -86,8 +82,8 @@ $row= mysqli_fetch_array($result);
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
- 
-      
+
+
     </ul>
   </nav>
   <!-- /.navbar -->
@@ -95,8 +91,8 @@ $row= mysqli_fetch_array($result);
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="#" class="brand-link">
-      <img src="../images/logo.png" alt=" Logo"  width="200" height="111" class="" style="opacity: .8">
+    <a href="index.php" class="brand-link">
+      <img src="../images/logo.png" alt="Logo" width="200" height="111" class="" style="opacity: .8">
 	        <span class="brand-text font-weight-light">  </span>
     </a>
 
@@ -128,13 +124,13 @@ $row= mysqli_fetch_array($result);
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-         
+
 		 <?php
 			   include('sidebar.php');
-			   
+
 			   ?>
-		 
-		 
+
+
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
@@ -149,12 +145,12 @@ $row= mysqli_fetch_array($result);
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">&nbsp;</h1>
+            <h1 class="m-0 text-dark">Fee Records</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Fee Record</li>
+              <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+              <li class="breadcrumb-item active">Fee Records</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -167,79 +163,71 @@ $row= mysqli_fetch_array($result);
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
-          <p>&nbsp;</p>
-          <table width="1069" border="0" align="center">
-            <tr>
-              <td width="1063" height="184"><div class="card">
-                <div class="card-header">
-                  <h4>Fee Record </h4>
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">All Fee Payment Records</h3>
+                <div class="card-tools">
+                  <a href="add-fee.php" class="btn btn-primary btn-sm">
+                    <i class="fa fa-plus"></i> Add New Fee
+                  </a>
+                  <a href="index.php" class="btn btn-secondary btn-sm ml-1">
+                    <i class="fa fa-arrow-left"></i> Back to Dashboard
+                  </a>
                 </div>
-                <!-- /.card-header -->
-                <div class="card-body">
-                  <table width="85%" align="center" class="table table-bordered table-striped" id="example1">
-                    <thead>
-                    <th width="10%"><div align="center">payment ID</div></th>
-                        <th width="10%"><div align="center">Student</div></th>
-							          <th width="7%"><div align="center">Photo</div></th>
-                        <th width="5%"><div align="center">Amount</div></th>
-                        <th width="5%"><div align="center">Matric No</div></th>
-                        <th width="5%"><div align="center">Date</div></th>
-                        
-                        
-				     						    </tr>
-                    </thead>
-                      <div align="center"></div>
-                    
-                    <tbody>
-                                      <?php 
-                                          $sql = "SELECT students.*, payment.* FROM students JOIN payment ON students.ID=payment.studentID ";
-                                           $result = $conn->query($sql);
-                                           while($row = $result->fetch_assoc()) { ?>
-                      <tr class="gradeX">
-                        <td height="69"><div align="center"><?php echo $row['feeID']; ?> </div></td>
-                        <td><div align="center"><?php echo $row['fullname']; ?></div></td>
-            					 <td><div align="center"><span class="controls"><img src="../<?php echo $row['photo'];?>"  width="66" height="65" border="2"/></span></div></td>
-                        <td><div align="center">NGN<?php echo number_format((float)$row['amount'] ,2); ?></div></td>
-                        <td><div align="center"><?php echo $row['matric_no']; ?></div></td>
-                        <td><div align="center"><?php echo $row['datepaid']; ?></div></td>
-                        
-					
-                    </tr>
-					<?php } ?>
-                    </tbody>
-                    <tfoot>
-                    </tfoot>
-                  </table>
-				  
-                </div>
-                <!-- /.card-body -->
               </div>
-                <table width="392" border="0" align="right">
-                  <tr>
-                    <td width="386"></td>
-                  </tr>
-                </table>
-                <p>&nbsp;</p>
-              </td>
-            </tr>
-			
-          </table>
-          <p>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-striped" id="example1">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Student Name</th>
+                        <th>Photo</th>
+                        <th>Amount</th>
+                        <th>Matric No</th>
+                        <th>Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $sql = "SELECT students.*, payment.* FROM students JOIN payment ON students.ID=payment.studentID ";
+                    $result = $conn->query($sql);
+                    while($row = $result->fetch_assoc()) { ?>
+                      <tr>
+                        <td><?php echo htmlspecialchars($row['feeID']); ?></td>
+                        <td><?php echo htmlspecialchars($row['fullname']); ?></td>
+                        <td class="text-center">
+                          <img src="../<?php echo $row['photo'];?>" alt="Student Photo" width="60" height="60" class="rounded-circle img-thumbnail">
+                        </td>
+                        <td class="text-center"><strong>NGN<?php echo number_format((float)$row['amount'], 2); ?></strong></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['matric_no']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['datepaid']); ?></td>
+                      </tr>
+                    <?php } ?>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <!-- /.card-body -->
+            </div>
             <!-- /.card -->
-          </p>
-        </div>
+          </div>
           <!-- /.col -->
-    </div>
+        </div>
         <!-- /.row -->
-  </div>
-      <!-- /.container-fluid --><!-- /.content -->
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
-      
+      <b>Version</b> 1.0.0
     </div>
- <?php  include('../footer.php');   ?>
+    <?php  include('../footer.php');   ?>
   </footer>
 
   <!-- Control Sidebar -->
@@ -269,15 +257,38 @@ $row= mysqli_fetch_array($result);
     $("#example1").DataTable({
       "responsive": true,
       "autoWidth": false,
+      "language": {
+        "paginate": {
+          "previous": "&laquo;",
+          "next": "&raquo;"
+        }
+      }
     });
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      "responsive": true,
+    
+    // Add ripple effect to buttons
+    $('.btn').on('click', function(e) {
+      let $button = $(this);
+      let circle = $('<span class="ripple"></span>');
+      
+      // Remove any existing ripples
+      $button.find('.ripple').remove();
+      
+      // Add the ripple to the button
+      $button.append(circle);
+      
+      // Position the ripple
+      let xPos = e.pageX - $button.offset().left;
+      let yPos = e.pageY - $button.offset().top;
+      
+      circle.css({
+        top: yPos,
+        left: xPos
+      });
+      
+      // Remove the ripple after the animation
+      setTimeout(function() {
+        circle.remove();
+      }, 600);
     });
   });
 </script>
